@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      #- name: Build project
+      #  run: npm run build
+
       - name: build images
         run: docker build -t cae-frontend:1.0.0 .
  
@@ -43,13 +46,13 @@ jobs:
       # Configure Huawei Cloud CLI.
       - name: Configure HuaweiCloud CLI
         run: |
-          sudo hcloud configure set --cli-profile=testAKSK --cli-mode=AKSK --cli-region=me-east-1 --cli-access-key={{ secrets.HUAWEI_SECRET_ACCESS_KEY}} --cli-secret-key={{ secrets.HUAWEI_SECRET_SECRET_KEY}} --cli-project-id=00248baf96984aecac0f8a976fa7ac00 --cli-domain-id=5a9e34472c434dcabaf1d0c0d51e4efd --cli-read-timeout=20 --cli-connect-timeout=10
+          sudo hcloud configure set --cli-profile=testAKSK --cli-mode=AKSK --cli-region=tr-west-1 --cli-access-key={{ secrets.HUAWEI_SECRET_ACCESS_KEY}} --cli-secret-key={{ secrets.HUAWEI_SECRET_SECRET_KEY}} --cli-project-id=afda03ce061d48409cc9ec203be48407 --cli-domain-id=5c438484e64d46caa7bca8e7d583de90 --cli-read-timeout=20 --cli-connect-timeout=10
 
       # Deploy Huawei Cloud CLI to CAE.
       - name: Deploy to CAE
         id: cli-command
         run: |
-          echo y | sudo hcloud CAE ExecuteAction --cli-region="me-east-1" --project_id="00248baf96984aecac0f8a976fa7ac00" --X-Enterprise-Project-ID="0" --X-Environment-ID="811db361-727e-4b57-b247-584433244394" --application_id="8f179f8e-f914-4ae2-bbe8-c629973c7f50" --component_id="4b3998c3-9771-4337-a653-d90132d2dd77" --api_version="v1" --kind="Action" --metadata.name="upgrade" --metadata.annotations.version="1.0.0" --spec.source.type="image" --spec.source.url="swr.me-east-1.myhuaweicloud.com/demo-cae/cae-frontend:1.0.0"
+          echo y | sudo hcloud CAE ExecuteAction --cli-region="tr-west-1" --project_id="afda03ce061d48409cc9ec203be48407" --X-Enterprise-Project-ID="39555f42-30b1-4053-ba63-15ebf605b871" --X-Environment-ID="5263fbd9-d728-4e8a-8407-d6d180d13081" --application_id="05a04718-fb36-46de-9cbb-128413557fca" --component_id="444bb8de-a365-401b-9141-f005ba45b0fb" --api_version="v1" --kind="Action" --metadata.name="upgrade" --metadata.annotations.version="1.0.0" --spec.source.type="image" --spec.source.url="swr.tr-west-1.myhuaweicloud.com/devrim/cae-frontend:1.0.0"
 
       - name: Print CLI command result
         run: |
