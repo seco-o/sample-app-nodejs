@@ -30,12 +30,12 @@ jobs:
         run: docker build -t cae-frontend:1.0.0 .
  
       - name: Login to SWR
-        run: docker login -u tr-west-1@${{ secrets.HUAWEI_SECRET_ACCESS_KEY}} -p ${{ secrets.HUAWEI_DOCKER_SECRET }} swr.me-east-1.myhuaweicloud.com
+        run: docker login -u tr-west-1@${{ secrets.HUAWEI_SECRET_ACCESS_KEY}} -p ${{ secrets.HUAWEI_DOCKER_SECRET }} swr.tr-west-1.myhuaweicloud.com
  
       - name: Push to SWR
         run: |
-          docker tag cae-frontend:1.0.0 swr.me-east-1.myhuaweicloud.com/demo-cae/cae-frontend:1.0.0
-          docker push swr.me-east-1.myhuaweicloud.com/demo-cae/cae-frontend:1.0.0
+          docker tag cae-frontend:1.0.0 swr.tr-west-1.myhuaweicloud.com/devrim/cae-frontend:1.0.0
+          docker push swr.tr-west-1.myhuaweicloud.com/devrim/cae-frontend:1.0.0
 
       # Download and install Huawei Cloud CLI.
       - name: Install HuaweiCloud CLI
