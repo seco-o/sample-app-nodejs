@@ -46,7 +46,17 @@ jobs:
       # Configure Huawei Cloud CLI.
       - name: Configure HuaweiCloud CLI
         run: |
-          sudo hcloud configure set --cli-profile=testAKSK --cli-mode=AKSK --cli-region=tr-west-1 --cli-access-key={{ secrets.HUAWEI_SECRET_ACCESS_KEY}} --cli-secret-key={{ secrets.HUAWEI_SECRET_SECRET_KEY}} --cli-project-id=afda03ce061d48409cc9ec203be48407 --cli-domain-id=5c438484e64d46caa7bca8e7d583de90 --cli-read-timeout=20 --cli-connect-timeout=10
+          sudo hcloud configure set \
+            --cli-profile=testAKSK \
+            --cli-mode=AKSK \
+            --cli-region=tr-west-1 \
+            --cli-access-key="${{ secrets.HUAWEI_SECRET_ACCESS_KEY }}" \
+            --cli-secret-key="${{ secrets.HUAWEI_SECRET_SECRET_KEY }}" \
+            --cli-project-id=afda03ce061d48409cc9ec203be48407 \
+            --cli-domain-id=5c438484e64d46caa7bca8e7d583de90 \
+            --cli-read-timeout=20 \
+            --cli-connect-timeout=10
+
 
       # Deploy Huawei Cloud CLI to CAE.
       - name: Deploy to CAE
