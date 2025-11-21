@@ -1,31 +1,58 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-name: Node.js CI
+name: Node.js Package
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm test --if-present
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: build images
+        run: docker build -t cae-frontend:1.0.0 .
+ 
+      - name: Login to SWR
+        run: docker login -u tr-west-1@${{ secrets.HUAWEI_SECRET_ACCESS_KEY}} -p ${{ secrets.HUAWEI_DOCKER_SECRET }} swr.me-east-1.myhuaweicloud.com
+ 
+      - name: Push to SWR
+        run: |
+          docker tag cae-frontend:1.0.0 swr.me-east-1.myhuaweicloud.com/demo-cae/cae-frontend:1.0.0
+          docker push swr.me-east-1.myhuaweicloud.com/demo-cae/cae-frontend:1.0.0
+
+      # Download and install Huawei Cloud CLI.
+      - name: Install HuaweiCloud CLI
+        run: |
+          curl -sSL https://cn-north-4-hdn-koocli.obs.cn-north-4.myhuaweicloud.com/cli/latest/hcloud_install.sh -o ./hcloud_install.sh && sudo bash ./hcloud_install.sh -y
+
+      # Configure Huawei Cloud CLI.
+      - name: Configure HuaweiCloud CLI
+        run: |
+          sudo hcloud configure set --cli-profile=testAKSK --cli-mode=AKSK --cli-region=me-east-1 --cli-access-key={{ secrets.HUAWEI_SECRET_ACCESS_KEY}} --cli-secret-key={{ secrets.HUAWEI_SECRET_SECRET_KEY}} --cli-project-id=00248baf96984aecac0f8a976fa7ac00 --cli-domain-id=5a9e34472c434dcabaf1d0c0d51e4efd --cli-read-timeout=20 --cli-connect-timeout=10
+
+      # Deploy Huawei Cloud CLI to CAE.
+      - name: Deploy to CAE
+        id: cli-command
+        run: |
+          echo y | sudo hcloud CAE ExecuteAction --cli-region="me-east-1" --project_id="00248baf96984aecac0f8a976fa7ac00" --X-Enterprise-Project-ID="0" --X-Environment-ID="811db361-727e-4b57-b247-584433244394" --application_id="8f179f8e-f914-4ae2-bbe8-c629973c7f50" --component_id="4b3998c3-9771-4337-a653-d90132d2dd77" --api_version="v1" --kind="Action" --metadata.name="upgrade" --metadata.annotations.version="1.0.0" --spec.source.type="image" --spec.source.url="swr.me-east-1.myhuaweicloud.com/demo-cae/cae-frontend:1.0.0"
+
+      - name: Print CLI command result
+        run: |
+          echo "Huawei Cloud CLI command output: ${{ steps.cli-command.outputs.result }}"
