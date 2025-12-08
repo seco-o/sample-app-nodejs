@@ -8,6 +8,7 @@ on:
 env:
   REGION_ID: tr-west-1
   PROJECT_ID: afda03ce061d48409cc9ec203be48407
+  PROJECT_NAME: "tr-west-1"
   SWR_ORGANIZATION: devrim
   IMAGE_NAME: cae-frontend
 
@@ -64,10 +65,23 @@ jobs:
 
       - name: Login to Huawei CCI
         run: |
-          	ccictl config set-cluster oneingage-demo --server=https://cci.tr-west-1.myhuaweicloud.com
-            ccictl config set-credentials sercan --auth-provider=iam --auth-provider-arg=iam-endpoint=https://iam.tr-west-1.myhuaweicloud.com --auth-provider-arg=cache="true" --auth-provider-arg=project-name="tr-west-1" --auth-provider-arg=ak="HPUAWXXUGNDVW9BKUVFW" --auth-provider-arg=sk="sgEOzp7Gag8YRGMpr11NHnN28jkATd8grQYTw9Ug"
-            ccictl config set-context oneingage-demo --cluster=oneingage-demo --user=sercan
-          	ccictl config use-context oneingage-demo
-            ccictl get namespace
+          ccictl config set-cluster oneingage-demo \
+            --server=https://cci.tr-west-1.myhuaweicloud.com
+
+          ccictl config set-credentials sercan \
+            --auth-provider=iam \
+            --auth-provider-arg=iam-endpoint=https://iam.tr-west-1.myhuaweicloud.com \
+            --auth-provider-arg=cache=true \
+            --auth-provider-arg=project-id=${{ env.PROJECT_NAME }} \
+            --auth-provider-arg=ak=${{ secrets.HUAWEI_SECRET_ACCESS_KEY }} \
+            --auth-provider-arg=sk=${{ secrets.HUAWEI_SECRET_SECRET_KEY }}
+
+          ccictl config set-context oneingage-demo \
+            --cluster=oneingage-demo \
+            --user=sercan
+
+          ccictl config use-context oneingage-demo
+
+          ccictl get namespace
 
 
