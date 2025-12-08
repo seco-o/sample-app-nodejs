@@ -64,9 +64,10 @@ jobs:
 
       - name: Login to Huawei CCI
         run: |
-          ccictl login \
-            --region ${{ env.REGION_ID }} \
-            --access-key ${{ secrets.HUAWEI_SECRET_ACCESS_KEY }} \
-            --secret-key ${{ secrets.HUAWEI_SECRET_SECRET_KEY }} \
-            --project-id ${{ env.PROJECT_ID }}
+          	ccictl config set-cluster oneingage-demo --server=https://cci.tr-west-1.myhuaweicloud.com
+            ccictl config set-credentials sercan --auth-provider=iam --auth-provider-arg=iam-endpoint=https://iam.tr-west-1.myhuaweicloud.com --auth-provider-arg=cache="true" --auth-provider-arg=project-name="tr-west-1" --auth-provider-arg=ak="HPUAWXXUGNDVW9BKUVFW" --auth-provider-arg=sk="sgEOzp7Gag8YRGMpr11NHnN28jkATd8grQYTw9Ug"
+            ccictl config set-context oneingage-demo --cluster=oneingage-demo --user=sercan
+          	ccictl config use-context oneingage-demo
+            ccictl get namespace
+
 
