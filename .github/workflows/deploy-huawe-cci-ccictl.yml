@@ -8,21 +8,21 @@ on:
 env:
   REGION_ID: tr-west-1
   PROJECT_ID: afda03ce061d48409cc9ec203be48407
-  PROJECT_NAME: "tr-west-1"
+  PROJECT_NAME: tr-west-1
   SWR_ORGANIZATION: devrim
   IMAGE_NAME: cae-frontend
 
 jobs:
-  build:
+  deploy:
     environment: Huawei 
     runs-on: ubuntu-latest
-    outputs:
-      image: ${{ steps.image.outputs.image }}
 
     steps:
+      # 1️⃣ Repo checkout (deployment.yaml için şart)
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Node
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
@@ -32,6 +32,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # 3️⃣ SWR login
       - name: Login to Huawei Cloud SWR
         uses: huaweicloud/swr-login@v2.1.0
         with:
@@ -39,8 +40,8 @@ jobs:
           access-key-id: ${{ secrets.HUAWEI_SECRET_ACCESS_KEY }}
           access-key-secret: ${{ secrets.HUAWEI_SECRET_SECRET_KEY }}
 
+      # 4️⃣ Image build & push (IMAGE env export edilir)
       - name: Build, Tag and Push Image
-        id: image
         env:
           SWR_REGISTRY: swr.${{ env.REGION_ID }}.myhuaweicloud.com
           IMAGE_TAG: ${{ github.sha }}
@@ -48,14 +49,9 @@ jobs:
           IMAGE=$SWR_REGISTRY/${{ env.SWR_ORGANIZATION }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG
           docker build -t $IMAGE .
           docker push $IMAGE
-          echo "::set-output name=image::$IMAGE"
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
-  deploy:
-    needs: build
-    environment: Huawei 
-    runs-on: ubuntu-latest
-
-    steps:
+      # 5️⃣ ccictl install
       - name: Install ccictl
         run: |
           curl -sSL https://cci-cn-south-4.obs.cn-south-4.myhuaweicloud.com/ccictl/ccictl -o ccictl
@@ -63,6 +59,7 @@ jobs:
           sudo mv ccictl /usr/local/bin/ccictl
           ccictl version
 
+      # 6️⃣ Huawei CCI login
       - name: Login to Huawei CCI
         run: |
           ccictl config set-cluster oneingage-demo \
@@ -72,7 +69,7 @@ jobs:
             --auth-provider=iam \
             --auth-provider-arg=iam-endpoint=https://iam.tr-west-1.myhuaweicloud.com \
             --auth-provider-arg=cache=true \
-            --auth-provider-arg=project-id=${{ env.PROJECT_NAME }} \
+            --auth-provider-arg=project-id=${{ env.PROJECT_ID }} \
             --auth-provider-arg=ak=${{ secrets.HUAWEI_SECRET_ACCESS_KEY }} \
             --auth-provider-arg=sk=${{ secrets.HUAWEI_SECRET_SECRET_KEY }}
 
@@ -81,17 +78,20 @@ jobs:
             --user=sercan
 
           ccictl config use-context oneingage-demo
+          ccictl get ns
 
-          ccictl get namespace
-
+      # 7️⃣ Namespace kontrolü
       - name: Ensure namespace exists
         run: |
           ccictl get ns oneingage || ccictl create ns oneingage
 
+      # 8️⃣ deployment.yaml içine image enjekte et
       - name: Inject image into deployment.yaml
         run: |
-          sed -i "s|IMAGE_PLACEHOLDER|${{ needs.build.outputs.image }}|g" deployment.yaml
+          sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" deployment.yaml
+          echo "Using image: $IMAGE"
 
+      # 9️⃣ Deploy
       - name: Deploy to Huawei CCI
         run: |
           ccictl apply -f deployment.yaml
