@@ -69,7 +69,7 @@ jobs:
       - name: Deploy to Huawei CCI
         uses: huaweicloud/deploy-cci-action@v1.2.0
         with:
+          region: tr-west-1
           namespace: oneingage               # CCI namespace
           deployment: cae-frontend          # Kubernetes Deployment adı
           image: ${{ needs.build.outputs.image }}
-          region: ${{ env.REGION_ID }}
