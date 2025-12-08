@@ -80,7 +80,7 @@ jobs:
           ccictl config use-context oneingage-demo
           ccictl get ns
 
-      # 7️⃣ Namespace kontrolü
+      # 7️⃣ Namespace kontrolüü
       - name: Ensure namespace exists
         run: |
           ccictl get ns oneingage || ccictl create ns oneingage
