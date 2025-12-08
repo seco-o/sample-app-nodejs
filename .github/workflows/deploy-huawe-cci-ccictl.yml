@@ -95,4 +95,3 @@ jobs:
       - name: Deploy to Huawei CCI
         run: |
           ccictl apply -f deployment.yaml
-          ccictl rollout status deployment/cae-frontend -n oneingage
