@@ -66,9 +66,10 @@ jobs:
       - name: Install kubectl
         uses: Azure/setup-kubectl@v2.1
 
-      - name: Deploy to Huawei CCI
-        uses: huaweicloud/deploy-cci-action@v1.2.0
-        with:
-          namespace: oneingage               # CCI namespace
-          deployment: cae-frontend          # Kubernetes Deployment adı
-          image: ${{ needs.build.outputs.image }}
+        - name: Deploy to Huawei CCI
+          uses: huaweicloud/deploy-cci-action@v1.2.0
+          with:
+            namespace: oneingage               # CCI namespace
+            deployment: cae-frontend          # Kubernetes Deployment adı
+            image: ${{ needs.build.outputs.image }}
+            region: ${{ env.REGION_ID }}
