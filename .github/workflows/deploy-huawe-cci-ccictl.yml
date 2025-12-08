@@ -84,4 +84,15 @@ jobs:
 
           ccictl get namespace
 
+      - name: Ensure namespace exists
+        run: |
+          ccictl get ns oneingage || ccictl create ns oneingage
 
+      - name: Inject image into deployment.yaml
+        run: |
+          sed -i "s|IMAGE_PLACEHOLDER|${{ needs.build.outputs.image }}|g" deployment.yaml
+
+      - name: Deploy to Huawei CCI
+        run: |
+          ccictl apply -f deployment.yaml
+          ccictl rollout status deployment/cae-frontend -n oneingage
