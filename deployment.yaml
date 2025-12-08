@@ -1,10 +1,10 @@
-apiVersion: cci/v2
 kind: Deployment
+apiVersion: cci/v2
 metadata:
   name: cae-frontend
   namespace: sercan
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: cae-frontend
@@ -15,15 +15,14 @@ spec:
     spec:
       containers:
         - name: cae-frontend
-          image: IMAGE_PLACEHOLDER
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3000
+          image: swr.tr-west-1.myhuaweicloud.com/devrim/image-name:tag
           resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
             requests:
               cpu: 500m
-              memory: 512Mi
-            limits:
-              cpu: 1
               memory: 1Gi
       dnsPolicy: Default
+      imagePullSecrets:
+        - name: imagepull-secret
