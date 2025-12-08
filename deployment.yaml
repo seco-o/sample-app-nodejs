@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: cae-frontend
-          image: swr.tr-west-1.myhuaweicloud.com/devrim/image-name:tag
+          image: swr.tr-west-1.myhuaweicloud.com/devrim/IMAGE_PLACEHOLDER
+          image: 
           resources:
             limits:
               cpu: 500m
