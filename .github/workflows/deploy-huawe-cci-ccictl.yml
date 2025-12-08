@@ -1,0 +1,72 @@
+name: Deploy to Huawei CCI  
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGION_ID: tr-west-1
+  PROJECT_ID: afda03ce061d48409cc9ec203be48407
+  SWR_ORGANIZATION: devrim
+  IMAGE_NAME: cae-frontend
+
+jobs:
+  build:
+    environment: Huawei 
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Login to Huawei Cloud SWR
+        uses: huaweicloud/swr-login@v2.1.0
+        with:
+          region: ${{ env.REGION_ID }}
+          access-key-id: ${{ secrets.HUAWEI_SECRET_ACCESS_KEY }}
+          access-key-secret: ${{ secrets.HUAWEI_SECRET_SECRET_KEY }}
+
+      - name: Build, Tag and Push Image
+        id: image
+        env:
+          SWR_REGISTRY: swr.${{ env.REGION_ID }}.myhuaweicloud.com
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE=$SWR_REGISTRY/${{ env.SWR_ORGANIZATION }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG
+          docker build -t $IMAGE .
+          docker push $IMAGE
+          echo "::set-output name=image::$IMAGE"
+
+  deploy:
+    needs: build
+    environment: Huawei 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install ccictl
+        run: |
+          curl -sSL https://cci-cn-south-4.obs.cn-south-4.myhuaweicloud.com/ccictl/ccictl -o ccictl
+          chmod +x ccictl
+          sudo mv ccictl /usr/local/bin/ccictl
+          ccictl version
+
+      - name: Login to Huawei CCI
+        run: |
+          ccictl login \
+            --region ${{ env.REGION_ID }} \
+            --access-key ${{ secrets.HUAWEI_SECRET_ACCESS_KEY }} \
+            --secret-key ${{ secrets.HUAWEI_SECRET_SECRET_KEY }} \
+            --project-id ${{ env.PROJECT_ID }}
+
