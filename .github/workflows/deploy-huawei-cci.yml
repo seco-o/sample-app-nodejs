@@ -13,6 +13,7 @@ env:
 
 jobs:
   build:
+    environment: Huawei 
     runs-on: ubuntu-latest
     outputs:
       image: ${{ steps.image.outputs.image }}
@@ -70,4 +71,3 @@ jobs:
           namespace: oneingage               # CCI namespace
           deployment: cae-frontend          # Kubernetes Deployment adı
           image: ${{ needs.build.outputs.image }}
-
