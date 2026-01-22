@@ -1,26 +1,22 @@
 kind: Deployment
 apiVersion: cci/v2
 metadata:
-  name: cae-frontend
-  namespace: sercan
+  name: sample-app-nodejs
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: cae-frontend
+      app: sample-app-nodejs
   template:
     metadata:
       labels:
-        app: cae-frontend
+        app: sample-app-nodejs
     spec:
       containers:
-        - name: cae-frontend
-          image: IMAGE_PLACEHOLDER
+        - name: sample-app-nodejs
+          image: docker-server/docker-org/sample-app-nodejs:image-version
           resources:
             limits:
-              cpu: 500m
-              memory: 1Gi
-            requests:
               cpu: 500m
               memory: 1Gi
       dnsPolicy: Default
