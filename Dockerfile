@@ -8,6 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 COPY .npmrc ./
 
+# Test NPM Registry
+RUN npm config get registry
+
 # 4. Bağımlılıkları yükle
 RUN npm install --production
 
