@@ -1,5 +1,5 @@
 kind: Deployment
-apiVersion: cci/v2
+apiVersion: apps/v1
 metadata:
   name: sample-app-nodejs
 spec:
