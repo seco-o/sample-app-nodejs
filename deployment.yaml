@@ -31,16 +31,3 @@ spec:
       dnsPolicy: Default
       imagePullSecrets:
         - name: imagepull-secret
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: sample-app-nodejs-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
-  storageClassName: csi-disk
