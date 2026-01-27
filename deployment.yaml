@@ -30,4 +30,4 @@ spec:
             claimName: sample-app-nodejs-pvc
       dnsPolicy: Default
       imagePullSecrets:
-        - name: imagepull-secret
+        - name: default-secret
