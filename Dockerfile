@@ -6,7 +6,7 @@ WORKDIR /app
 
 # 3. package.json ve package-lock.json dosyalarını kopyala
 COPY package*.json ./
-COPY .npmrc ./
+# COPY .npmrc ./
 
 # Test NPM Registry
 RUN npm config get registry
