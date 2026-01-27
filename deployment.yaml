@@ -1,5 +1,5 @@
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: sample-app-nodejs
 spec:
@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: sample-app-nodejs
+      annotations:
+        backup.velero.io/backup-volumes: data
     spec:
       containers:
         - name: sample-app-nodejs
@@ -19,6 +21,26 @@ spec:
             limits:
               cpu: 500m
               memory: 1Gi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: sample-app-nodejs-pvc
       dnsPolicy: Default
       imagePullSecrets:
         - name: imagepull-secret
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sample-app-nodejs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: csi-disk
