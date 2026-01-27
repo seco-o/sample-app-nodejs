@@ -12,7 +12,7 @@ COPY package*.json ./
 RUN npm config get registry
 
 # 4. Bağımlılıkları yükle
-RUN npm install --production
+RUN npm install --omit=dev
 
 # 5. Uygulama dosyalarını kopyala
 COPY . .
